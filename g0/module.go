@@ -24,8 +24,8 @@ func New() modules.Module {
 }
 
 func (root *RootModule) NewModuleInstance(vu modules.VU) modules.Instance { // nolint:varnamelen
-	yaegi := interp.New(interp.Options{}) //nolint:exhaustruct
-	mod := &Module{                       //nolint:exhaustruct
+	yaegi := interp.New(interp.Options{Env: root.toEnvArray(vu.InitEnv().RuntimeOptions.Env)}) //nolint:exhaustruct
+	mod := &Module{                                                                            //nolint:exhaustruct
 		vu:      vu,
 		yaegi:   yaegi,
 		assert:  assertions.New(addon.NewTestingT(vu, false)),
@@ -37,6 +37,14 @@ func (root *RootModule) NewModuleInstance(vu modules.VU) modules.Instance { // n
 	}
 
 	return mod
+}
+
+func (root *RootModule) toEnvArray(envMap map[string]string) []string {
+	ret := make([]string, 0)
+	for key, value := range envMap {
+		ret = append(ret, key+"="+value)
+	}
+	return ret
 }
 
 type Module struct {
